@@ -7,7 +7,17 @@
 % Used by the template
 \usepackage{setspace}
 \usepackage{multicol}
-\usepackage[dvipsnames]{xcolor}
+%\usepackage[dvipsnames]{xcolor} %% also loaded below
+
+% Added for the chestx-ray8 datasheet
+\usepackage{dirtytalk}
+\usepackage{graphicx}
+% For tables
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{makecell}
+\renewcommand\theadfont{\bfseries} % bold column headers
 
 
 \title{ChestX-ray8 Datasheet}
@@ -51,16 +61,25 @@ TODO: add brief explanation of the dataset
 \dsquestionex{For what purpose was the dataset created?}{Was there a specific task in mind? Was there a specific gap that needed to be filled? Please provide a description.}
 
 \dsanswer{
+Deep learning has shown promising results in some medicals applications. However, methods proposed so far \say{are evaluated on some small-to-middle scale problems of (at most) several hundred patients. It remains unclear how well the current deep learning techniques will scale up to tens of thousands of patient studies.} \cite{Wang2017}
+
+\say{Particularly for chest X-rays, the largest public dataset is OpenI \ldots that contains 3,955 radiology reports from the Indiana Network for Patient Care and 7,470 associated chest X-rays from the hospitals picture archiving and communication system (PACS).} \cite{Wang2017}
+
+Creating large datasets for medical applications is hindered by the labeling process. Medical images cannot be labeled with the crowdsource methods used for generic image datasets. On the other hand, X-ray images are accompanied by extensive radiological reports. We use natural language processing (NLP) to extract labels from these reports.
+
+With the automated label process in place, we were able to create a dataset with over 100,000 frontal X-ray images, annotated with fourteen common thoracic diseases. We name this dataset \say{ChestX-ray8} (originally from the eight diseases we were able to mine from the reports, later enhanced to fourteen --- we kept the name for historical reasons).
 }
 
 \dsquestion{Who created this dataset (e.g., which team, research group) and on behalf of which entity (e.g., company, institution, organization)?}
 
 \dsanswer{
+The dataset was created by a team from the National Institutes of Health Clinical Center.
 }
 
 \dsquestionex{Who funded the creation of the dataset?}{If there is an associated grant, please provide the name of the grantor and the grant name and number.}
 
 \dsanswer{
+\say{This work was supported by the Intramural Research Program of the NIH Clinical Center (clinicalcenter.nih.gov) and National Library of Medicine (www.nlm.nih.gov). We thank NVIDIA Corporation for the GPU donations.} \cite{HealthClinicalCenter2017}
 }
 
 \dsquestion{Any other comments?}
@@ -73,81 +92,126 @@ TODO: add brief explanation of the dataset
 \dsquestionex{What do the instances that comprise the dataset represent (e.g., documents, photos, people, countries)?}{ Are there multiple types of instances (e.g., movies, users, and ratings; people and interactions between them; nodes and edges)? Please provide a description.}
 
 \dsanswer{
+Each instance is a frontal chest X-ray and a set of labels that identifies diseases in the image. One image may have up to fourteen labels, as multiple diseases may be present in one patient. Instances labeled \say{No finding} could contain disease patterns other than the listed fourteen or uncertain findings within the fourteen categories.
+
+Each instance also includes patient ID, gender, age, follow up number, view position, original image size, and original pixel spacing.
+
+Figure \ref{fig:chestX-ray8-overview} shows the distribution of findings, age groups, gender, view position in the dataset and in the train/test set.
 }
 
 \dsquestion{How many instances are there in total (of each type, if appropriate)?}
 
 \dsanswer{
+There are 112,120 images of 30,805 unique patients \cite{HealthClinicalCenter2017}. Table \ref{tab:chestX-ray8-diseases-breakdown} shows the number of images with each disease.
 }
 
 \dsquestionex{Does the dataset contain all possible instances or is it a sample (not necessarily random) of instances from a larger set?}{ If the dataset is a sample, then what is the larger set? Is the sample representative of the larger set (e.g., geographic coverage)? If so, please describe how this representativeness was validated/verified. If it is not representative of the larger set, please describe why not (e.g., to cover a more diverse range of instances, because instances were withheld or unavailable).}
 
 \dsanswer{
+The dataset was created from the Clinical Center's PACS system. \say{Given those 8 text keywords, we search the PACS system to pull out all the related radiological reports (together with images) as our target corpus. A variety of Natural Language Processing (NLP) techniques are adopted for detecting the pathology keywords and removal of negation and uncertainty. Each radiological report will be either linked with one or more keywords or marked with ’Normal’ as the background category.} \cite{Wang2017}
 }
 
 \dsquestionex{What data does each instance consist of? “Raw” data (e.g., unprocessed text or images) or features?}{In either case, please provide a description.}
 
 \dsanswer{
+Each instance is an image extracted from DICOM and downscaled to 1024 $\times$ 1024 pixels. Images are stored in PNG format.
+
+Besides the image files, each image has the following data stored in a CSV file, whose key is the image file name:
+
+\begin{itemize}
+    \item File name: the complete name of the file, including the extension. The name of the file encodes the patient ID. For example, the file 00000003\_000.png is an image for the patient ID 3.
+    \item Finding labels: a list of diseases labels extracted from the radiological report.
+    \item Follow-up \#: the follow-up sequence number.
+    \item Patient ID: a number that uniquely identifies a patient. It is a sequential number that does not encode any other information.
+    \item Patient age: patient age in years at the time the image was taken.
+    \item Patient gender: biological gender (male or female) of the patient.
+    \item View position: either PA (posterioranterior) or AP (anteriorposterior).
+    \item Original image width: the width of the original image in DICOM in pixels.
+    \item Original image height: the height of the original image in DICOM in pixels.
+    \item Original image pixel spacing X: original image column spacing from DICOM.
+    \item Original image pixel spacing Y: original image row spacing from DICOM.
+\end{itemize}
+
+Bounding boxes are available for 983 images. The bounding boxes were created by a board-certified radiologist.
 }
 
 \dsquestionex{Is there a label or target associated with each instance?}{If so, please provide a description.}
 
 \dsanswer{
+Each image has one or more labels indicating a disease. Multiple diseases are separated by \textbar (vertical bar). For example, \say{Mass{\textbar}Nodule} indicates that \say{Mass} and \say{Nodule} were extracted from the report. Multiple labels are listed in alphabetical order. Instances labeled \say{No finding} could contain other diseases (other than the listed fourteen) or uncertain findings within the fourteen diseases.
 }
 
 \dsquestionex{Is any information missing from individual instances?}{If so, please provide a description, explaining why this information is missing (e.g., because it was unavailable). This does not include intentionally removed information, but might include, e.g., redacted text.}
 
 \dsanswer{
+Everything is included in the dataset.
 }
 
 \dsquestionex{Are relationships between individual instances made explicit (e.g., users’ movie ratings, social network links)?}{If so, please describe how these relationships are made explicit.}
 
 \dsanswer{
+One patient may have multiple images. The \say{patient ID} column in the dataset description identifies the patient. In addition to that, the \say{follow-up \#} column indicates a follow-up for a patient, thus a chronological order for the images of a patient.
 }
 
 \dsquestionex{Are there recommended data splits (e.g., training, development/validation, testing)?}{If so, please provide a description of these splits, explaining the rationale behind them.}
 
 \dsanswer{
+The dataset comes with a specified train/test split, such that none of the patients in the training split are in the test split and vice versa.
 }
 
 \dsquestionex{Are there any errors, sources of noise, or redundancies in the dataset?}{If so, please provide a description.}
 
 \dsanswer{
+The disease labels were extracted from the radiological reports with NLP. While \say{[t]he text-mined disease labels are expected to have accuracy \textgreater90\%.} \cite{Health2017}, \say{[t]here are several things about the published image labels that we want to clarify:
+
+\begin{enumerate}
+    \item Different terms and phrases might be used for the same finding: The image labels are mined from the radiology reports using NLP techniques. Those disease keywords are purely extracted from the reports. The radiologists often described the findings and impressions by using their own preferred terms and phrases for each particular disease pattern or a group of patterns, where the chance of using all possible terms in the description is small.
+
+\item Which terms should be used: We understand it is hard if not impossible to distinguish certain pathologies solely based on the findings in the images. However, other information from multiple sources may be also available to the radiologists (e.g. reason for exam, patients’ previous studies and other clinical information) when he/she reads the study. The diagnostic terms used in the report (like ‘pneumonia’) come from a decision based on all of the available information, not just the imaging findings.
+    
+    \item Entity extraction using NLP is not perfect: we try to maximize the recall of finding accurate disease findings by eliminating all possible negations and uncertainties of disease mentions. Terms like ‘It is hard to exclude ...’ will be treated as uncertainty cases and then the image will be labeled as ‘No finding’.
+    
+    \item ‘No finding’ is not equal to ‘normal’.  Images labeled with ‘No finding’ could contain disease patterns other than the listed 14 or uncertain findings within the 14 categories. 
+\end{enumerate} \cite{HealthClinicalCenter2017}
+}
 }
 
 \dsquestionex{Is the dataset self-contained, or does it link to or otherwise rely on external resources (e.g., websites, tweets, other datasets)?}{If it links to or relies on external resources, a) are there guarantees that they will exist, and remain constant, over time; b) are there official archival versions of the complete dataset (i.e., including the external resources as they existed at the time the dataset was created); c) are there any restrictions (e.g., licenses, fees) associated with any of the external resources that might apply to a future user? Please provide descriptions of all external resources and any restrictions associated with them, as well as links or other access points, as appropriate.}
 
 \dsanswer{
+The dataset is self-contained.
 }
 
 \dsquestionex{Does the dataset contain data that might be considered confidential (e.g., data that is protected by legal privilege or by doctor-patient confidentiality, data that includes the content of individuals non-public communications)?}{If so, please provide a description.}
 
 \dsanswer{
+Although the dataset has images from patients, \say{[it] was rigorously screened to remove all personally identifiable information before release.} \cite{Health2017}
 }
 
 \dsquestionex{Does the dataset contain data that, if viewed directly, might be offensive, insulting, threatening, or might otherwise cause anxiety?}{If so, please describe why.}
 
-\dsanswer{
-}
+\dsanswer{No.}
 
 \dsquestionex{Does the dataset relate to people?}{If not, you may skip the remaining questions in this section.}
 
-\dsanswer{
-}
+\dsanswer{Yes. The dataset contains X-rays from human patients.}
 
 \dsquestionex{Does the dataset identify any subpopulations (e.g., by age, gender)?}{If so, please describe how these subpopulations are identified and provide a description of their respective distributions within the dataset.}
 
 \dsanswer{
+The dataset identifies the gender and age in years of each patient. Figure \ref{fig:chestX-ray8-findings-age-group-gender} shows the distribution of findings across age groups and gender.
+
+There are indications in the literature that gender imbalance in the training dataset affects the model performance \cite{Larrazabal2020}. This dataset is well-balanced in overall gender distribution, as well as findings for each gender.
 }
 
 \dsquestionex{Is it possible to identify individuals (i.e., one or more natural persons), either directly or indirectly (i.e., in combination with other data) from the dataset?}{If so, please describe how.}
 
-\dsanswer{
-}
+\dsanswer{No. \say{With patient privacy being paramount, the dataset was rigorously screened to remove all personally identifiable information before release.} \cite{Health2017} }
 
 \dsquestionex{Does the dataset contain data that might be considered sensitive in any way (e.g., data that reveals racial or ethnic origins, sexual orientations, religious beliefs, political opinions or union memberships, or locations; financial or health data; biometric or genetic data; forms of government identification, such as social security numbers; criminal history)?}{If so, please provide a description.}
 
 \dsanswer{
+The dataset identifies diseases extracted from radiological reports. Other information about the patient's health may be inferred from the images. However, there is no link between an image and the identity of the patient.
 }
 
 \dsquestion{Any other comments?}
@@ -159,67 +223,60 @@ TODO: add brief explanation of the dataset
 \dsquestionex{How was the data associated with each instance acquired?}{Was the data directly observable (e.g., raw text, movie ratings), reported by subjects (e.g., survey responses), or indirectly inferred/derived from other data (e.g., part-of-speech tags, model-based guesses for age or language)? If data was reported by subjects or indirectly inferred/derived from other data, was the data validated/verified? If so, please describe how.}
 
 \dsanswer{
+\say{A variety of Natural Language Processing (NLP) techniques are adopted for detecting the pathology keywords and removal of negation and uncertainty. Each radiological report will be either linked with one or more keywords or marked with ’Normal’ as the background category. [E]ach image is labeled with one or multiple pathology keywords or “Normal” otherwise.} \cite{Wang2017}
 }
 
 \dsquestionex{What mechanisms or procedures were used to collect the data (e.g., hardware apparatus or sensor, manual human curation, software program, software API)?}{How were these mechanisms or procedures validated?}
 
 \dsanswer{
+The images were extracted from our institute's DICOM system. The labels were \say{mined from our institute’s PACS system. First, we short-list eight common thoracic pathology keywords that are frequently observed and diagnosed, i.e., Atelectasis, Cardiomegaly, Effusion, Infiltration, Mass, Nodule, Pneumonia and Pneumathorax \dots, based on radiologists’ feedback. Given those 8 text keywords, we search the PACS system to pull out all the related radiological reports (together with images) as our target corpus.} \cite{Wang2017}
 }
 
 \dsquestion{If the dataset is a sample from a larger set, what was the sampling strategy (e.g., deterministic, probabilistic with specific sampling probabilities)?}
 
 \dsanswer{
+The patients were selected from the NIH Clinical Center. PACS system records, covering 1992 to 2015. Out of all records, the ones with the eight (later fourteen) disease keywords were selected for the dataset.
 }
 
 \dsquestion{Who was involved in the data collection process (e.g., students, crowdworkers, contractors) and how were they compensated (e.g., how much were crowdworkers paid)?}
 
 \dsanswer{
+A board-certified radiologist verified the terms used to mine the PACS system. A board-certified radiologist added bounding boxes to selected 983 images, covering 200 instances of each disease.
 }
 
 \dsquestionex{Over what timeframe was the data collected? Does this timeframe match the creation timeframe of the data associated with the instances (e.g., recent crawl of old news articles)?}{If not, please describe the timeframe in which the data associated with the instances was created.}
 
-\dsanswer{
-}
+\dsanswer{The data was collected in 2017. The PACS records are from 1992 to 2015.}
 
 \dsquestionex{Were any ethical review processes conducted (e.g., by an institutional review board)?}{If so, please provide a description of these review processes, including the outcomes, as well as a link or other access point to any supporting documentation.}
 
-\dsanswer{
-}
+\dsanswer{Unknown.}
 
 \dsquestionex{Does the dataset relate to people?}{If not, you may skip the remaining questions in this section.}
 
-\dsanswer{
-}
+\dsanswer{Yes.}
 
 \dsquestion{Did you collect the data from the individuals in question directly, or obtain it via third parties or other sources (e.g., websites)?}
 
-\dsanswer{
-}
+\dsanswer{Data was extracted from the NIH Clinical Center DICOM and PACS systems.}
 
 \dsquestionex{Were the individuals in question notified about the data collection?}{If so, please describe (or show with screenshots or other information) how notice was provided, and provide a link or other access point to, or otherwise reproduce, the exact language of the notification itself.}
 
-\dsanswer{
-}
+\dsanswer{Patients are notified of the X-ray and medical records collection as part of their consultation.}
 
 \dsquestionex{Did the individuals in question consent to the collection and use of their data?}{If so, please describe (or show with screenshots or other information) how consent was requested and provided, and provide a link or other access point to, or otherwise reproduce, the exact language to which the individuals consented.}
 
-\dsanswer{
-}
+\dsanswer{Unknown. However, the NIH Clinical Center \textit{Legal, Ethical, and Safety Issues} document states that \say{[s]ome of the information obtained from you may appear in scientific publications or be presented to professional audiences at meetings. It may be used for the purpose of teaching health professionals or students in the health professions. Under these circumstances, measures are taken to conceal your identity.} \cite{HealthClinicalCenter}}
 
 \dsquestionex{If consent was obtained, were the consenting individuals provided with a mechanism to revoke their consent in the future or for certain uses?}{If so, please provide a description, as well as a link or other access point to the mechanism (if appropriate).}
 
-\dsanswer{
-}
+\dsanswer{N/A}
 
 \dsquestionex{Has an analysis of the potential impact of the dataset and its use on data subjects (e.g., a data protection impact analysis) been conducted?}{If so, please provide a description of this analysis, including the outcomes, as well as a link or other access point to any supporting documentation.}
 
-\dsanswer{
-}
+\dsanswer{Unknown. However, the dataset does not have information that directly identifies individual patients.}
 
 \dsquestion{Any other comments?}
-
-\dsanswer{
-}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -228,22 +285,43 @@ TODO: add brief explanation of the dataset
 \dsquestionex{Was any preprocessing/cleaning/labeling of the data done (e.g., discretization or bucketing, tokenization, part-of-speech tagging, SIFT feature extraction, removal of instances, processing of missing values)?}{If so, please provide a description. If not, you may skip the remainder of the questions in this section.}
 
 \dsanswer{
+\say{
+\footnote{The description of the label extraction, being an innovative part of the work, is one of the strong parts of the original paper \cite{Wang2017}. That entire section is quoted here.}Overall, our approach produces labels using the reports in two passes. In the first iteration, we detected all the disease concept in the corpus. The main body of each chest X-ray report is generally structured as “Comparison”, “Indication”, “Findings”, and “Impression” sections. Here, we focus on detecting disease concepts in the Findings and Impression sections. If a report contains neither of these two sections, the full-length report will then be considered. In the second pass, we code the reports as “Normal” if they do not contain any diseases (not limited to 8 predefined pathologies).
+
+\textbf{Pathology Detection}: We mine the radiology reports for disease concepts using two tools, DNorm \ldots and MetaMap \ldots. DNorm is a machine learning method for disease recognition and normalization. It maps every mention of keywords in a report to a unique concept ID in the Systematized Nomenclature of Medicine Clinical Terms (or SNOMED-CT), which is a standardized vocabulary of clinical terminology for the electronic exchange of clinical health information.
+
+MetaMap is another prominent tool to detect bioconcepts from the biomedical text corpus. Different from DNorm, it is an ontology-based approach for the detection of Unified Medical Language System\textcopyright (UMLS\textcopyright) Metathesaurus. In this work, we only consider the semantic types of Diseases or Syndromes and Findings (namely ‘dsyn’ and ‘fndg’ respectively). To maximize the recall of our automatic disease detection, we merge the results of DNorm and MetaMap. \ldots
+
+\textbf{Negation and Uncertainty}: The disease detection algorithm locates every keyword mentioned in the radiology report no matter if it is truly present or negated. To eliminate the noisy labeling, we need to rule out those negated pathological statements and, more importantly, uncertain mentions of findings and diseases, e.g., “suggesting obstructive lung disease”.
+
+Although many text processing systems \ldots can handle the negation/uncertainty detection problem, most of them exploit regular expressions on the text directly. One of the disadvantages to use regular expressions for negation/uncertainty detection is that they cannot capture various syntactic constructions for multiple subjects. For example, in the phrase of “clear of A and B”, the regular expression can capture “A” as a negation but not “B”, particularly when both “A” and “B” are long and complex noun phrases (“clear of focal airspace disease, pneumothorax, or pleural effusion” in Fig. \ref{fig:chestX-ray8-figure-3}).
+
+To overcome this complication, we hand-craft a number of novel rules of negation/uncertainty defined on the syntactic level in this work. More specifically, we utilize the syntactic dependency information because it is close to the semantic relationship between words and thus has become prevalent in biomedical text processing. We defined our rules on the dependency graph, by utilizing the dependency label and direction information between words.
+
+As the first step of preprocessing, we split and tokenize the reports into sentences using NLTK \ldots. Next we parse each sentence by the Bllip parser \ldots using David McCloskys biomedical model \ldots. The syntactic dependencies are then obtained from “CCProcessed” dependencies output by applying Stanford dependencies converter \ldots on the parse tree. The “CCProcessed” representation propagates conjunct dependencies thus simplifies coordinations. As a result, we can use fewer rules to match more complex constructions. For an example as shown in Fig. \ref{fig:chestX-ray8-figure-3}, we could use “clear $\rightarrow$ prep of $\rightarrow$ DISEASE” to detect three negations from the text (neg, focal airspace disease), (neg, pneumothorax), and (neg, pleural effusion).
+
+Furthermore, we label a radiology report as “normal” if it meets one of the following criteria:
+
+\begin{itemize}
+    \item If there is no disease detected in the report. Note that here we not only consider 8 diseases of interest in this paper but all diseases detected in the reports.
+    \item If the report contains text-mined concepts of “normal” or “normal size” (CUIs C0205307 and C0332506 in the SNOMED-CT concepts respectively).
+\end{itemize}
+} \cite{Wang2017}
+
+\textbf{Images:} The images were extracted from DICOM and resized to 1024 $\times$ 1024 pixels (from the usual 3000 $\times$ 2000 pixels of an X-ray image). \say{Their intensity ranges are rescaled using the default window settings stored in the DICOM header files.} \cite{Wang2017} The resulting grayscale is 0-255 \cite{OakdenRayner2019}.
+
+\textbf{Bounding boxes:} A smaller set of images has a bounding box for the diseases. \say{[W]e first select 200 instances for each pathology (1,600 instances total), consisting of 983 images. Given an image and a disease keyword, a board-certified radiologist identified only the corresponding disease instance in the image and labeled it with a B-Box. The B-Box is then outputted as an XML file.} \cite{Wang2017}
 }
 
 \dsquestionex{Was the “raw” data saved in addition to the preprocessed/cleaned/labeled data (e.g., to support unanticipated future uses)?}{If so, please provide a link or other access point to the “raw” data.}
 
-\dsanswer{
-}
+\dsanswer{The raw data is available in the DICOM and PACS system. However, it will not be made available to the public because it contains personally identifiable data and other private pieces of information.}
 
 \dsquestionex{Is the software used to preprocess/clean/label the instances available?}{If so, please provide a link or other access point.}
 
-\dsanswer{
-}
+\dsanswer{No}
 
 \dsquestion{Any other comments?}
-
-\dsanswer{
-}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -251,28 +329,35 @@ TODO: add brief explanation of the dataset
 
 \dsquestionex{Has the dataset been used for any tasks already?}{If so, please provide a description.}
 
-\dsanswer{
+\dsanswer{Together with the dataset \say{we present a unified weakly-supervised multi-label image classification and pathology localization framework, which can detect the presence of multiple pathologies and subsequently generate bounding boxes around the corresponding pathologies.} \cite{Wang2017}
 }
 
 \dsquestionex{Is there a repository that links to any or all papers or systems that use the dataset?}{If so, please provide a link or other access point.}
 
-\dsanswer{
-}
+\dsanswer{No.}
 
 \dsquestion{What (other) tasks could the dataset be used for?}
 
 \dsanswer{
+\say{By using this free dataset, the hope is that academic and research institutions across the country will be able to teach a computer to read and process extremely large amounts of scans, to confirm the results radiologists have found and potentially identify other findings that may have been overlooked.} \cite{Health2017}
 }
 
 \dsquestionex{Is there anything about the composition of the dataset or the way it was collected and preprocessed/cleaned/labeled that might impact future uses?}{For example, is there anything that a future user might need to know to avoid uses that could result in unfair treatment of individuals or groups (e.g., stereotyping, quality of service issues) or other undesirable harms (e.g., financial harms, legal risks) If so, please provide a description. Is there anything a future user could do to mitigate these undesirable harms?}
 
-\dsanswer{
+\dsanswer{The image downsampling and reduction in gray levels to 256 may result in missing some important artifacts. \say{Of note, subtle pneumothoraces, small nodules, and retrocardiac opacities become nearly impossible to diagnose for a human expert.} \cite{OakdenRayner2019}
+ 
+The images were collected at one institution only. It is known that the devices and methods used in an institution may result in markers that a neural network may learn, instead of learning the disease-specific markers \cite{Zech2018} \cite{Pooch2019} \cite{Yao2019}.
+
+\say{The image labels are NLP extracted so there would be some erroneous labels but the NLP labelling accuracy is estimated to be \textgreater90\%.} \cite{HealthClinicalCenter2017}. However, \say{[the label problems] mean the dataset as defined currently is not fit for training medical systems, and research on the dataset cannot generate valid medical claims without significant additional justification.} \cite{OakdenRayner2018}
+
+Some of the labels, such as \textit{effusion}, \textit{pneumothorax}, and \textit{fibrosis}, need further interpretation and verification \cite{OakdenRayner2018}. For example, \say{\textit{pneumothorax} is often labeled for already treated cases (i.e. a drain is visible in the image which is used to treat the pneumothorax) in the ChestX-ray14 dataset. \ldots [A network may learn] not only to detect an acute pneumothorax but also the presence of chest drains.} \cite{Baltruschat2019} as shown in figure \ref{fig:chestX-ray8-pneumothorax-with-drain}. Labels may come not only from the images, but also from \say{multipl[e] sources [available] to the radiologists (e.g. reason for exam, patients’ previous studies and other clinical information) when he/she reads the study.} \cite{HealthClinicalCenter2017}
+
+This is due to the nature of radiology reports. \say{Radiology reports are not objective, factual descriptions of images. The goal of a radiology report is to provide useful, actionable information to their referrer, usually another doctor.} \cite{OakdenRayner2018}
 }
 
 \dsquestionex{Are there tasks for which the dataset should not be used?}{If so, please provide a description.}
 
-\dsanswer{
-}
+\dsanswer{We do not recommend using this dataset alone to develop clinical applications. Please review the previous item for details.}
 
 \dsquestion{Any other comments?}
 
@@ -282,38 +367,29 @@ TODO: add brief explanation of the dataset
 
 \dsquestionex{Will the dataset be distributed to third parties outside of the entity (e.g., company, institution, organization) on behalf of which the dataset was created?}{If so, please provide a description.}
 
-\dsanswer{
-}
+\dsanswer{Yes.}
 
 \dsquestionex{How will the dataset will be distributed (e.g., tarball on website, API, GitHub)}{Does the dataset have a digital object identifier (DOI)?}
 
-\dsanswer{
-}
+\dsanswer{The dataset is available in the NIH Clinical Center Box folder at \url{https://nihcc.app.box.com/v/ChestXray-NIHCC}.}
 
 \dsquestion{When will the dataset be distributed?}
 
-\dsanswer{
-}
+\dsanswer{The dataset is already available.}
 
 \dsquestionex{Will the dataset be distributed under a copyright or other intellectual property (IP) license, and/or under applicable terms of use (ToU)?}{If so, please describe this license and/or ToU, and provide a link or other access point to, or otherwise reproduce, any relevant licensing terms or ToU, as well as any fees associated with these restrictions.}
 
-\dsanswer{
-}
+\dsanswer{\say{The usage of the data set is unrestricted. But you should provide the link to our original download site, acknowledge the NIH Clinical Center and provide a citation to our CVPR 2017 paper.} \cite{HealthClinicalCenter2017}}
 
 \dsquestionex{Have any third parties imposed IP-based or other restrictions on the data associated with the instances?}{If so, please describe these restrictions, and provide a link or other access point to, or otherwise reproduce, any relevant licensing terms, as well as any fees associated with these restrictions.}
 
-\dsanswer{
-}
+\dsanswer{No.}
 
 \dsquestionex{Do any export controls or other regulatory restrictions apply to the dataset or to individual instances?}{If so, please describe these restrictions, and provide a link or other access point to, or otherwise reproduce, any supporting documentation.}
 
-\dsanswer{
-}
+\dsanswer{Unknown.}
 
 \dsquestion{Any other comments?}
-
-\dsanswer{
-}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -321,46 +397,109 @@ TODO: add brief explanation of the dataset
 
 \dsquestion{Who will be supporting/hosting/maintaining the dataset?}
 
-\dsanswer{
-}
+\dsanswer{The NIH Clinical Center hosts and maintains the dataset.}
 
 \dsquestion{How can the owner/curator/manager of the dataset be contacted (e.g., email address)?}
 
-\dsanswer{
-}
+\dsanswer{Refer to the README file in the dataset folder.}
 
 \dsquestionex{Is there an erratum?}{If so, please provide a link or other access point.}
 
-\dsanswer{
-}
+\dsanswer{The dataset folder has a log file that list all changes, including corrections.}
 
 \dsquestionex{Will the dataset be updated (e.g., to correct labeling errors, add new instances, delete instances)?}{If so, please describe how often, by whom, and how updates will be communicated to users (e.g., mailing list, GitHub)?}
 
-\dsanswer{
-}
+\dsanswer{Updates are done as needed and noted in the log file. There is no notification mechanism. Users of the dataset are requested to check the log file periodically.}
 
 \dsquestionex{If the dataset relates to people, are there applicable limits on the retention of the data associated with the instances (e.g., were individuals in question told that their data would be retained for a fixed period of time and then deleted)?}{If so, please describe these limits and explain how they will be enforced.}
 
-\dsanswer{
-}
+\dsanswer{No.}
 
 \dsquestionex{Will older versions of the dataset continue to be supported/hosted/maintained?}{If so, please describe how. If not, please describe how its obsolescence will be communicated to users.}
 
-\dsanswer{
-}
+\dsanswer{Older versions are not maintained.}
 
 \dsquestionex{If others want to extend/augment/build on/contribute to the dataset, is there a mechanism for them to do so?}{If so, please provide a description. Will these contributions be validated/verified? If so, please describe how. If not, why not? Is there a process for communicating/distributing these contributions to other users? If so, please provide a description.}
 
-\dsanswer{
-}
+\dsanswer{No.}
 
 \dsquestion{Any other comments?}
 
-\dsanswer{
-}
-
 \end{multicols}
 \end{singlespace}
+
+\begin{singlespace}
+\small{
+\begin{longtable}{lrrrr}
+Finding & Male & Female & Total & \% \\
+\midrule
+No finding              & 33,922 & 26,439 & 60,361 & 53.8   \\
+Infiltration            & 5,383  & 4,164  & 9,547  & 8.5    \\
+Atelectasis             & 2,603  & 1,612  & 4,215  & 3.8    \\
+Effusion                & 2,158  & 1,797  & 3,955  & 3.5    \\ \midrule[0.1pt]
+Nodule                  & 1,524  & 1,181  & 2,705  & 2.4    \\
+Pneumothorax            & 1,001  & 1,193  & 2,194  & 2.0    \\
+Mass                    & 1,301  & 838   & 2,139  & 1.9    \\
+Effusion + Infiltration   & 942   & 661   & 1,603  & 1.4    \\ \midrule[0.1pt]
+Atelectasis + Infiltration & 844   & 506   & 1,350  & 1.2    \\
+Consolidation           & 771   & 539   & 1,310  & 1.2    \\
+Atelectasis + Effusion    & 680   & 485   & 1,165  & 1.0    \\
+Pleural\_Thickening     & 660   & 466   & 1,126  & 1.0    \\ \midrule[0.1pt]
+Cardiomegaly            & 508   & 585   & 1,093  & 1.0    \\
+Emphysema               & 562   & 330   & 892   & 0.8    \\
+Infiltration + Nodule     & 492   & 337   & 829   & 0.7    \\
+Atelectasis + Effusion + Infiltration     & 424   & 313   & 737   & 0.7    \\ \midrule[0.1pt]
+Fibrosis                & 387   & 340   & 727   & 0.6    \\
+Edema                   & 329     & 299   & 628   & 0.6    \\
+Cardiomegaly + Effusion   & 209   & 275   & 484   & 0.4    \\
+Consolidation + Infiltration            & 243   & 198   & 441   & 0.4    \\ \midrule[0.1pt]
+Infiltration + Mass       & 263   & 157   & 420   & 0.4    \\
+Effusion + Pneumothorax   & 202   & 201   & 403   & 0.4    \\
+Effusion + Mass           & 229   & 173   & 402   & 0.4    \\
+Atelectasis + Consolidation             & 212   & 186   & 398   & 0.4    \\ \midrule[0.1pt]
+Mass + Nodule             & 246   & 148   & 394   & 0.4    \\
+Edema + Infiltration      & 193   & 199   & 392   & 0.3    \\
+Infiltration + Pneumothorax             & 188   & 157   & 345   & 0.3    \\
+Emphysema + Pneumothorax  & 202   & 135   & 337   & 0.3    \\ \midrule[0.1pt]
+Consolidation + Effusion  & 202   & 135   & 337   & 0.3    \\
+Pneumonia               & 194   & 128   & 322   & 0.3   \\
+\midrule
+All other findings      & 6,266     & 4,603 & 10,869 & 9.7 \\
+\bottomrule
+\caption[ChestX-ray8 top thirty findings.]{ChestX-ray8 top thirty findings. Multiple findings in one image are listed in alphabetical order. ``No finding'' is not equal to ``normal''.  Images labeled with ``No finding'' could contain disease patterns other than the listed fourteen or uncertain findings within the fourteen categories \cite{HealthClinicalCenter2017}.}
+\label{tab:chestX-ray8-diseases-breakdown}
+\end{longtable}
+} % small
+\end{singlespace}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/chestX-ray8-overview.png}
+    \caption[ChestX-ray8 image distribution by findings, age groups, gender, and view position.]{ChestX-ray8 distribution of images by findings, age groups, gender, and view position. The first row shows the overall dataset. The second rows shows the split for the train/test sets. In general, the train/test split is well balanced across category. There is a slightly larger proportion of the ``AP'' view position in the test set\textsuperscript{a}.}
+    \scriptsize\textsuperscript{a} Visualizations created with \href{https://pair-code.github.io/facets/}{Google Facets} and available in \href{https://github.com/fau-masters-collected-works-cgarbin/dataset-visualization-faces-streamlit}{this GitHub repository}.
+    \label{fig:chestX-ray8-overview}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{figures/chestX-ray8-findings-age-group-gender.png}
+    \caption[ChestX-ray top ten findings by age group and gender.]{ChestX-ray8 top ten findings by age group and gender (and ``other'' to account for the other findings). Genders are well balanced across age groups. Adults and middle ages are the larger groups. Younger and older ages have fewer images\textsuperscript{a}.}
+    \scriptsize\textsuperscript{a} Visualizations created with \href{https://pair-code.github.io/facets/}{Google Facets} and available in \href{https://github.com/fau-masters-collected-works-cgarbin/dataset-visualization-faces-streamlit}{this GitHub repository}.    \label{fig:chestX-ray8-findings-age-group-gender}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{figures/chestX-ray8-figure-3.png}
+    \caption[ChestX-ray8 text parser negation detection example.]{ChestX-ray8 text parser dependency graph to detect three negations in the text: “clear of focal airspace disease, pneumothorax, or pleural effusion”. \cite{Wang2017}}
+    \label{fig:chestX-ray8-figure-3}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.7\columnwidth]{figures/chestX-ray8-pneumothorax-with-drain.png}
+    \caption[Model erroneously picking up chest drains as main feature of ``pneumothorax''.]{Both images are labeled with ``pneumothorax''. In the top image the patient has not been treated yet. In the bottom image the patient has been treated (chest drains indicated with arrows). Using Grad-CAM \cite{Selvaraju2019} to visualize the important areas for prediction shows that models incorrectly learn to predict based on the treatment, not the pathology (bottom image) \cite{Baltruschat2019}.}
+    \label{fig:chestX-ray8-pneumothorax-with-drain}
+\end{figure}
 
 \section{Appendix}
 
