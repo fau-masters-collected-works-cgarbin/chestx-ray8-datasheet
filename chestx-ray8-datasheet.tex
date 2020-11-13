@@ -10,21 +10,13 @@
 \usepackage[dvipsnames]{xcolor}
 
 
-\title{A template for datasheets for datasets}
+\title{ChestX-ray8 Datasheet}
 \author{Christian Garbin}
 \date{November 2020}
 
 \begin{document}
 
 \maketitle
-
-\section{Datasheets for datasets}
-
-\href{https://arxiv.org/abs/1803.09010}{Datasheets for Datasets} ``document [the dataset] motivation, composition, collection process, recommended uses, and so on. [They] have the potential to increase transparency and accountability within the machine learning community, mitigate unwanted biases in machine learning systems, facilitate greater reproducibility of machine learning results, and help researchers and practitioners select more appropriate datasets for their chosen tasks.''
-
-The motivation behind the proposal was the electronics industry, where every component has a datasheet that describes its operating characteristics and recommended uses. In machine learning, data is the input for model training. Using the wrong dataset, or using a dataset outside of its original intent, or even not understanding well enough the limitations of a dataset, has dire consequences for the model. However, ``[d]espite the importance of data to machine learning, there is no standardized process for documenting machine learning datasets. To address this gap, we propose datasheets for datasets.''
-
-\section{Template}
 
 \newcommand{\dssectionheader}[1]{%
    \noindent\framebox[\columnwidth]{%
@@ -44,9 +36,11 @@ The motivation behind the proposal was the electronics industry, where every com
    {\noindent \footnotesize {#1} \medskip}
 }
 
-% Manual formatting for graduate writing thesis submission
-% Remove for single space version
-%\pagebreak
+\section{ChestX-ray8}
+
+TODO: add brief explanation of the dataset
+
+\section{Datasheet}
 
 \begin{singlespace}
 \begin{multicols}{2}
@@ -368,5 +362,12 @@ The motivation behind the proposal was the electronics industry, where every com
 \end{multicols}
 \end{singlespace}
 
-\end{document}
+\section{Appendix}
 
+\subsection{Datasheets for datasets}
+
+\href{https://arxiv.org/abs/1803.09010}{Datasheets for Datasets} ``document [the dataset] motivation, composition, collection process, recommended uses, and so on. [They] have the potential to increase transparency and accountability within the machine learning community, mitigate unwanted biases in machine learning systems, facilitate greater reproducibility of machine learning results, and help researchers and practitioners select more appropriate datasets for their chosen tasks.''
+
+The motivation behind the proposal was the electronics industry, where every component has a datasheet that describes its operating characteristics and recommended uses. In machine learning, data is the input for model training. Using the wrong dataset, or using a dataset outside of its original intent, or even not understanding well enough the limitations of a dataset, has dire consequences for the model. However, ``[d]espite the importance of data to machine learning, there is no standardized process for documenting machine learning datasets. To address this gap, we propose datasheets for datasets.''
+
+\end{document}
