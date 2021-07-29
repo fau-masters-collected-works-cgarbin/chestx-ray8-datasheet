@@ -1,76 +1,28 @@
-\documentclass{article}
-\usepackage[utf8]{inputenc}
-
-% Used in the explanation text
-\usepackage[colorlinks]{hyperref}
-
-% Used by the template
-\usepackage{setspace}
-\usepackage{multicol}
-%\usepackage[dvipsnames]{xcolor} %% also loaded below
-
-% Added for the chestx-ray8 datasheet
-\usepackage{dirtytalk}
-\usepackage{graphicx}
-% For tables
-\usepackage[table,xcdraw]{xcolor}
-\usepackage{longtable}
-\usepackage{booktabs}
-\usepackage{makecell}
-\renewcommand\theadfont{\bfseries} % bold column headers
-
-
-\title{ChestX-ray8 Datasheet}
-\author{Christian Garbin}
-\date{November 2020}
-
 \begin{document}
 
-\maketitle
+% Color picked from the Datasets for Datasheets paper
+\definecolor{darkblue}{RGB}{46,25, 110}
 
 \newcommand{\dssectionheader}[1]{%
    \noindent\framebox[\columnwidth]{%
-      {\fontfamily{phv}\selectfont \textbf{\textcolor{blue}{#1}}}
+      {\fontfamily{phv}\selectfont \textbf{\textcolor{darkblue}{#1}}}
    }
 }
 
 \newcommand{\dsquestion}[1]{%
-   {\noindent \scriptsize {\fontfamily{phv}\selectfont \textcolor{blue}{\textbf{#1}}}}
+    {\noindent \fontfamily{phv}\selectfont \textcolor{darkblue}{\textbf{#1}}}
 }
 
 \newcommand{\dsquestionex}[2]{%
-   {\noindent \scriptsize {\fontfamily{phv}\selectfont \textcolor{blue}{\textbf{#1} #2}}}
+    {\noindent \fontfamily{phv}\selectfont \textcolor{darkblue}{\textbf{#1} #2}}
 }
 
 \newcommand{\dsanswer}[1]{%
-   {\noindent \footnotesize {#1} \medskip}
+   {\noindent #1 \medskip}
 }
 
-\section{ChestX-ray8}
-
-This paper converts the description of the ChestX-ray8 dataset \cite{Wang2017} from the prose of its original paper into the structured format of a dataset datasheet \cite{Gebru2018}. It originally had images for eight diseases, enhanced later to cover fourteen diseases, resulting in the other name by which this dataset is known, ChestX-ray14. The paper describing the dataset still refers to it as \say{ChestX-ray8}.
-
-ChestX-ray8 is a dataset with over 100,000 chest X-ray images and their labels. It was created and made publicly available by the National Institutes of Health Clinical Center \cite{Health2017}.
-
-Information for the datasheet was compiled from:
-
-\begin{itemize}
-    \item \href{https://arxiv.org/abs/1705.02315v5}{The latest (fifth) version of the paper} \cite{Wang2017}.
-    \item \href{https://www.nih.gov/news-events/news-releases/nih-clinical-center-provides-one-largest-publicly-available-chest-X-ray-datasets-scientific-community}{The NIH news release} \cite{Health2017}.
-    \item \href{https://lukeoakdenrayner.wordpress.com/2017/11/18/quick-thoughts-on-chestxray14-performance-claims-and-clinical-tasks/}{The initial review of the dataset by L. Oakden-Rayner} \cite{OakdenRayner2017}.
-    \item \href{https://lukeoakdenrayner.wordpress.com/2017/12/18/the-chestxray14-dataset-problems/}{The detailed analysis of problems with the dataset by L. Oakden-Rayner} \cite{OakdenRayner2018}.
-    \item \href{https://www.nature.com/articles/s41598-019-42294-8}{The study of of different CNNs using ChestX-ray8} \cite{Baltruschat2019}.
-    \item \href{https://nihcc.app.box.com/v/ChestXray-NIHCC/file/219760887468}{The detailed description of the instances} \cite{HealthClinicalCenter2017}.
-    \item \href{https://nihcc.app.box.com/v/ChestXray-NIHCC/file/220660789610}{The README file for the dataset} \cite{HealthClinicalCenter2017}.
-    \item \href{https://nihcc.app.box.com/v/ChestXray-NIHCC/file/249502714403}{The FAQ for the dataset} \cite{HealthClinicalCenter2017}.
-\end{itemize}
-
-The datasheet is written from the first-person point of view, as if the authors had created it, to make it more realistic. Whenever applicable, the source for the information used in the datasheet is cited.
-
-\section{Datasheet}
-
 \begin{singlespace}
-\begin{multicols}{2}
+%\begin{multicols}{2}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \dssectionheader{Motivation}
@@ -101,6 +53,7 @@ The dataset was created by a team from the National Institutes of Health Clinica
 
 \dsquestion{Any other comments?}
 
+\dsanswer{No.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -116,10 +69,65 @@ Each instance also includes patient ID, gender, age, follow up number, view posi
 Figure \ref{fig:chestX-ray8-overview} shows the distribution of findings, age groups, gender, view position in the dataset and in the train/test set.
 }
 
+\begin{figure*}[!htb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/chestX-ray8-overview.png}
+    \caption[ChestX-ray8 image distribution by findings, age groups, gender, and view position.]{ChestX-ray8 distribution of images by findings, age groups, gender, and view position. The top row shows the distributions for the overall dataset. The bottom row shows the distributions for the train/test sets. In general, the train/test split is well balanced across categories. There is a slightly larger proportion of the ``AP'' view position in the test set\textsuperscript{a}.}
+    \scriptsize\textsuperscript{a} Visualizations created with \href{https://pair-code.github.io/facets/}{Google Facets} and available on \href{https://github.com/fau-masters-collected-works-cgarbin/dataset-visualization-faces-streamlit}{this GitHub repository}.
+    \label{fig:chestX-ray8-overview}
+\end{figure*}
+
 \dsquestion{How many instances are there in total (of each type, if appropriate)?}
 
 \dsanswer{
 There are 112,120 images of 30,805 unique patients \cite{HealthClinicalCenter2017}. Table \ref{tab:chestX-ray8-diseases-breakdown} shows the number of images with each disease.
+
+\begin{table*}[h!]
+\small
+\centering
+\caption[ChestX-ray8 top thirty findings.]{ChestX-ray8 top thirty findings. Multiple findings in one image are listed in alphabetical order. ``No finding'' is not equal to ``normal''.  Images labeled with ``No finding'' could contain disease patterns other than the listed fourteen or uncertain findings within the fourteen categories \cite{HealthClinicalCenter2017}.}
+\label{tab:chestX-ray8-diseases-breakdown}
+\begin{adjustbox}{width = 0.6\textwidth}
+\begin{tabular}{lrrrr}
+Finding & Male & Female & Total & \% \\
+\midrule
+No finding              & 33,922 & 26,439 & 60,361 & 53.8   \\
+Infiltration            & 5,383  & 4,164  & 9,547  & 8.5    \\
+Atelectasis             & 2,603  & 1,612  & 4,215  & 3.8    \\
+Effusion                & 2,158  & 1,797  & 3,955  & 3.5    \\ \midrule[0.1pt]
+Nodule                  & 1,524  & 1,181  & 2,705  & 2.4    \\
+Pneumothorax            & 1,001  & 1,193  & 2,194  & 2.0    \\
+Mass                    & 1,301  & 838   & 2,139  & 1.9    \\
+Effusion + Infiltration   & 942   & 661   & 1,603  & 1.4    \\ \midrule[0.1pt]
+Atelectasis + Infiltration & 844   & 506   & 1,350  & 1.2    \\
+Consolidation           & 771   & 539   & 1,310  & 1.2    \\
+Atelectasis + Effusion    & 680   & 485   & 1,165  & 1.0    \\
+Pleural\_Thickening     & 660   & 466   & 1,126  & 1.0    \\ \midrule[0.1pt]
+Cardiomegaly            & 508   & 585   & 1,093  & 1.0    \\
+Emphysema               & 562   & 330   & 892   & 0.8    \\
+Infiltration + Nodule     & 492   & 337   & 829   & 0.7    \\
+Atelectasis + Effusion + Infiltration     & 424   & 313   & 737   & 0.7    \\ \midrule[0.1pt]
+Fibrosis                & 387   & 340   & 727   & 0.6    \\
+Edema                   & 329     & 299   & 628   & 0.6    \\
+Cardiomegaly + Effusion   & 209   & 275   & 484   & 0.4    \\
+Consolidation + Infiltration            & 243   & 198   & 441   & 0.4    \\ \midrule[0.1pt]
+Infiltration + Mass       & 263   & 157   & 420   & 0.4    \\
+Effusion + Pneumothorax   & 202   & 201   & 403   & 0.4    \\
+Effusion + Mass           & 229   & 173   & 402   & 0.4    \\
+Atelectasis + Consolidation             & 212   & 186   & 398   & 0.4    \\ \midrule[0.1pt]
+Mass + Nodule             & 246   & 148   & 394   & 0.4    \\
+Edema + Infiltration      & 193   & 199   & 392   & 0.3    \\
+Infiltration + Pneumothorax             & 188   & 157   & 345   & 0.3    \\
+Emphysema + Pneumothorax  & 202   & 135   & 337   & 0.3    \\ \midrule[0.1pt]
+Consolidation + Effusion  & 202   & 135   & 337   & 0.3    \\
+Pneumonia               & 194   & 128   & 322   & 0.3   \\
+\midrule
+All other findings      & 6,266     & 4,603 & 10,869 & 9.7 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table*}
+
 }
 
 \dsquestionex{Does the dataset contain all possible instances or is it a sample (not necessarily random) of instances from a larger set?}{ If the dataset is a sample, then what is the larger set? Is the sample representative of the larger set (e.g., geographic coverage)? If so, please describe how this representativeness was validated/verified. If it is not representative of the larger set, please describe why not (e.g., to cover a more diverse range of instances, because instances were withheld or unavailable).}
@@ -221,6 +229,15 @@ The dataset identifies the gender and age in years of each patient. Figure \ref{
 There are indications in the literature that gender imbalance in the training dataset affects the model performance \cite{Larrazabal2020}. This dataset is well-balanced in overall gender distribution, as well as findings for each gender.
 }
 
+\begin{figure*}[!htb]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/chestX-ray8-findings-age-group-gender.png}
+    \caption[ChestX-ray top ten findings by age group and gender.]{ChestX-ray8 top ten findings (columns) by age group (rows) and gender (red/blue colors). The ``other'' columns accounts for all other findings. The figure shows that 1) genders are well balanced across age groups, 2) adults and middle ages are the larger groups, and 3) younger and older ages have fewer images\textsuperscript{a}.}
+    \scriptsize\textsuperscript{a} Visualizations created with \href{https://pair-code.github.io/facets/}{Google Facets} and available on \href{https://github.com/fau-masters-collected-works-cgarbin/dataset-visualization-faces-streamlit}{this GitHub repository}.
+    \label{fig:chestX-ray8-findings-age-group-gender}
+\end{figure*}
+
+
 \dsquestionex{Is it possible to identify individuals (i.e., one or more natural persons), either directly or indirectly (i.e., in combination with other data) from the dataset?}{If so, please describe how.}
 
 \dsanswer{No. \say{With patient privacy being paramount, the dataset was rigorously screened to remove all personally identifiable information before release.} \cite{Health2017} }
@@ -232,6 +249,8 @@ The dataset identifies diseases extracted from radiological reports. Other infor
 }
 
 \dsquestion{Any other comments?}
+
+\dsanswer{No.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -295,6 +314,8 @@ A board-certified radiologist verified the terms used to mine the PACS system. A
 
 \dsquestion{Any other comments?}
 
+\dsanswer{No.}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
 \dssectionheader{Preprocessing/cleaning/labeling}
@@ -312,6 +333,13 @@ MetaMap is another prominent tool to detect bioconcepts from the biomedical text
 \textbf{Negation and Uncertainty}: The disease detection algorithm locates every keyword mentioned in the radiology report no matter if it is truly present or negated. To eliminate the noisy labeling, we need to rule out those negated pathological statements and, more importantly, uncertain mentions of findings and diseases, e.g., “suggesting obstructive lung disease”.
 
 Although many text processing systems \ldots can handle the negation/uncertainty detection problem, most of them exploit regular expressions on the text directly. One of the disadvantages to use regular expressions for negation/uncertainty detection is that they cannot capture various syntactic constructions for multiple subjects. For example, in the phrase of “clear of A and B”, the regular expression can capture “A” as a negation but not “B”, particularly when both “A” and “B” are long and complex noun phrases (“clear of focal airspace disease, pneumothorax, or pleural effusion” in Fig. \ref{fig:chestX-ray8-figure-3}).
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/chestX-ray8-figure-3.png}
+    \caption[ChestX-ray8 text parser negation detection example.]{ChestX-ray8 text parser dependency graph to detect three negations in the text: “clear of focal airspace disease, pneumothorax, or pleural effusion”. \cite{Wang2017}}
+    \label{fig:chestX-ray8-figure-3}
+\end{figure}
 
 To overcome this complication, we hand-craft a number of novel rules of negation/uncertainty defined on the syntactic level in this work. More specifically, we utilize the syntactic dependency information because it is close to the semantic relationship between words and thus has become prevalent in biomedical text processing. We defined our rules on the dependency graph, by utilizing the dependency label and direction information between words.
 
@@ -336,9 +364,11 @@ Furthermore, we label a radiology report as “normal” if it meets one of the 
 
 \dsquestionex{Is the software used to preprocess/clean/label the instances available?}{If so, please provide a link or other access point.}
 
-\dsanswer{No}
+\dsanswer{No.}
 
 \dsquestion{Any other comments?}
+
+\dsanswer{No.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -367,9 +397,16 @@ The images were collected at one institution only. It is known that the devices 
 
 \say{The image labels are NLP extracted so there would be some erroneous labels but the NLP labelling accuracy is estimated to be \textgreater90\%.} \cite{HealthClinicalCenter2017}. However, \say{[the label problems] mean the dataset as defined currently is not fit for training medical systems, and research on the dataset cannot generate valid medical claims without significant additional justification.} \cite{OakdenRayner2018}
 
-Some of the labels, such as \textit{effusion}, \textit{pneumothorax}, and \textit{fibrosis}, need further interpretation and verification \cite{OakdenRayner2018}. For example, \say{\textit{pneumothorax} is often labeled for already treated cases (i.e. a drain is visible in the image which is used to treat the pneumothorax) in the ChestX-ray14 dataset. \ldots [A network may learn] not only to detect an acute pneumothorax but also the presence of chest drains.} \cite{Baltruschat2019} as shown in figure \ref{fig:chestX-ray8-pneumothorax-with-drain}. Labels may come not only from the images, but also from \say{multipl[e] sources [available] to the radiologists (e.g. reason for exam, patients’ previous studies and other clinical information) when he/she reads the study.} \cite{HealthClinicalCenter2017}
+Some of the labels, such as \textit{effusion}, \textit{pneumothorax}, and \textit{fibrosis}, need further interpretation and verification \cite{OakdenRayner2018}. For example, \say{\textit{pneumothorax} is often labeled for already treated cases (i.e. a drain is visible in the image which is used to treat the pneumothorax) in the ChestX-ray14 dataset. \ldots [A network may learn] not only to detect an acute pneumothorax but also the presence of chest drains.} \cite{Baltruschat2019} as shown in figure \ref{fig:chestX-ray8-pneumothorax-with-drain}. 
 
-This is due to the nature of radiology reports. \say{Radiology reports are not objective, factual descriptions of images. The goal of a radiology report is to provide useful, actionable information to their referrer, usually another doctor.} \cite{OakdenRayner2018}
+Labels may come not only from the images, but also from \say{multipl[e] sources [available] to the radiologists (e.g. reason for exam, patients’ previous studies and other clinical information) when he/she reads the study.} \cite{HealthClinicalCenter2017} This is due to the nature of radiology reports. \say{Radiology reports are not objective, factual descriptions of images. The goal of a radiology report is to provide useful, actionable information to their referrer, usually another doctor.} \cite{OakdenRayner2018}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/chestX-ray8-pneumothorax-with-drain.png}
+    \caption[Model erroneously picking up chest drains as main feature of ``pneumothorax''.]{Both images are labeled with ``pneumothorax''. In the top image the patient has not been treated yet. In the bottom image the patient has been treated (chest drains indicated with arrows). Using Grad-CAM \cite{Selvaraju2019} to visualize the important areas for prediction shows that models incorrectly learn to predict based on the treatment, not the pathology (bottom image) \cite{Baltruschat2019}.}
+    \label{fig:chestX-ray8-pneumothorax-with-drain}
+\end{figure}
 }
 
 \dsquestionex{Are there tasks for which the dataset should not be used?}{If so, please provide a description.}
@@ -377,6 +414,8 @@ This is due to the nature of radiology reports. \say{Radiology reports are not o
 \dsanswer{We do not recommend using this dataset alone to develop clinical applications. Please review the previous item for details.}
 
 \dsquestion{Any other comments?}
+
+\dsanswer{No.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -407,6 +446,8 @@ This is due to the nature of radiology reports. \say{Radiology reports are not o
 \dsanswer{Unknown.}
 
 \dsquestion{Any other comments?}
+
+\dsanswer{No.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bigskip
@@ -442,91 +483,9 @@ This is due to the nature of radiology reports. \say{Radiology reports are not o
 
 \dsquestion{Any other comments?}
 
-\end{multicols}
+\dsanswer{No.}
+
+%\end{multicols}
 \end{singlespace}
-
-\begin{singlespace}
-\small{
-\begin{longtable}{lrrrr}
-Finding & Male & Female & Total & \% \\
-\midrule
-No finding              & 33,922 & 26,439 & 60,361 & 53.8   \\
-Infiltration            & 5,383  & 4,164  & 9,547  & 8.5    \\
-Atelectasis             & 2,603  & 1,612  & 4,215  & 3.8    \\
-Effusion                & 2,158  & 1,797  & 3,955  & 3.5    \\ \midrule[0.1pt]
-Nodule                  & 1,524  & 1,181  & 2,705  & 2.4    \\
-Pneumothorax            & 1,001  & 1,193  & 2,194  & 2.0    \\
-Mass                    & 1,301  & 838   & 2,139  & 1.9    \\
-Effusion + Infiltration   & 942   & 661   & 1,603  & 1.4    \\ \midrule[0.1pt]
-Atelectasis + Infiltration & 844   & 506   & 1,350  & 1.2    \\
-Consolidation           & 771   & 539   & 1,310  & 1.2    \\
-Atelectasis + Effusion    & 680   & 485   & 1,165  & 1.0    \\
-Pleural\_Thickening     & 660   & 466   & 1,126  & 1.0    \\ \midrule[0.1pt]
-Cardiomegaly            & 508   & 585   & 1,093  & 1.0    \\
-Emphysema               & 562   & 330   & 892   & 0.8    \\
-Infiltration + Nodule     & 492   & 337   & 829   & 0.7    \\
-Atelectasis + Effusion + Infiltration     & 424   & 313   & 737   & 0.7    \\ \midrule[0.1pt]
-Fibrosis                & 387   & 340   & 727   & 0.6    \\
-Edema                   & 329     & 299   & 628   & 0.6    \\
-Cardiomegaly + Effusion   & 209   & 275   & 484   & 0.4    \\
-Consolidation + Infiltration            & 243   & 198   & 441   & 0.4    \\ \midrule[0.1pt]
-Infiltration + Mass       & 263   & 157   & 420   & 0.4    \\
-Effusion + Pneumothorax   & 202   & 201   & 403   & 0.4    \\
-Effusion + Mass           & 229   & 173   & 402   & 0.4    \\
-Atelectasis + Consolidation             & 212   & 186   & 398   & 0.4    \\ \midrule[0.1pt]
-Mass + Nodule             & 246   & 148   & 394   & 0.4    \\
-Edema + Infiltration      & 193   & 199   & 392   & 0.3    \\
-Infiltration + Pneumothorax             & 188   & 157   & 345   & 0.3    \\
-Emphysema + Pneumothorax  & 202   & 135   & 337   & 0.3    \\ \midrule[0.1pt]
-Consolidation + Effusion  & 202   & 135   & 337   & 0.3    \\
-Pneumonia               & 194   & 128   & 322   & 0.3   \\
-\midrule
-All other findings      & 6,266     & 4,603 & 10,869 & 9.7 \\
-\bottomrule
-\caption[ChestX-ray8 top thirty findings.]{ChestX-ray8 top thirty findings. Multiple findings in one image are listed in alphabetical order. ``No finding'' is not equal to ``normal''.  Images labeled with ``No finding'' could contain disease patterns other than the listed fourteen or uncertain findings within the fourteen categories \cite{HealthClinicalCenter2017}.}
-\label{tab:chestX-ray8-diseases-breakdown}
-\end{longtable}
-} % small
-\end{singlespace}
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{figures/chestX-ray8-overview.png}
-    \caption[ChestX-ray8 image distribution by findings, age groups, gender, and view position.]{ChestX-ray8 distribution of images by findings, age groups, gender, and view position. The first row shows the overall dataset. The second rows shows the split for the train/test sets. In general, the train/test split is well balanced across category. There is a slightly larger proportion of the ``AP'' view position in the test set\textsuperscript{a}.}
-    \scriptsize\textsuperscript{a} Visualizations created with \href{https://pair-code.github.io/facets/}{Google Facets} and available in \href{https://github.com/fau-masters-collected-works-cgarbin/dataset-visualization-faces-streamlit}{this GitHub repository}.
-    \label{fig:chestX-ray8-overview}
-\end{figure}
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.8\columnwidth]{figures/chestX-ray8-findings-age-group-gender.png}
-    \caption[ChestX-ray top ten findings by age group and gender.]{ChestX-ray8 top ten findings by age group and gender (and ``other'' to account for the other findings). Genders are well balanced across age groups. Adults and middle ages are the larger groups. Younger and older ages have fewer images\textsuperscript{a}.}
-    \scriptsize\textsuperscript{a} Visualizations created with \href{https://pair-code.github.io/facets/}{Google Facets} and available in \href{https://github.com/fau-masters-collected-works-cgarbin/dataset-visualization-faces-streamlit}{this GitHub repository}.    \label{fig:chestX-ray8-findings-age-group-gender}
-\end{figure}
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.8\columnwidth]{figures/chestX-ray8-figure-3.png}
-    \caption[ChestX-ray8 text parser negation detection example.]{ChestX-ray8 text parser dependency graph to detect three negations in the text: “clear of focal airspace disease, pneumothorax, or pleural effusion”. \cite{Wang2017}}
-    \label{fig:chestX-ray8-figure-3}
-\end{figure}
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.7\columnwidth]{figures/chestX-ray8-pneumothorax-with-drain.png}
-    \caption[Model erroneously picking up chest drains as main feature of ``pneumothorax''.]{Both images are labeled with ``pneumothorax''. In the top image the patient has not been treated yet. In the bottom image the patient has been treated (chest drains indicated with arrows). Using Grad-CAM \cite{Selvaraju2019} to visualize the important areas for prediction shows that models incorrectly learn to predict based on the treatment, not the pathology (bottom image) \cite{Baltruschat2019}.}
-    \label{fig:chestX-ray8-pneumothorax-with-drain}
-\end{figure}
-
-\section{Appendix}
-
-\subsection{Datasheets for datasets}
-
-\href{https://arxiv.org/abs/1803.09010}{Datasheets for Datasets} ``document [the dataset] motivation, composition, collection process, recommended uses, and so on. [They] have the potential to increase transparency and accountability within the machine learning community, mitigate unwanted biases in machine learning systems, facilitate greater reproducibility of machine learning results, and help researchers and practitioners select more appropriate datasets for their chosen tasks.''
-
-The motivation behind the proposal was the electronics industry, where every component has a datasheet that describes its operating characteristics and recommended uses. In machine learning, data is the input for model training. Using the wrong dataset, or using a dataset outside of its original intent, or even not understanding well enough the limitations of a dataset, has dire consequences for the model. However, ``[d]espite the importance of data to machine learning, there is no standardized process for documenting machine learning datasets. To address this gap, we propose datasheets for datasets.''
-
-\bibliographystyle{abbrv}
-\bibliography{chestx-ray8-datasheet}
 
 \end{document}
