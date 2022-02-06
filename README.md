@@ -19,3 +19,13 @@ An item of the "Uses" section, describing the image format and label details.
 Based on the [datasheet for dataset template in Overleaf](https://www.overleaf.com/latex/templates/datasheet-for-dataset-template/jgqyyzyprxth).
 
 A text version of the datasheet for dataset template is available [here](https://github.com/fau-masters-collected-works-cgarbin/datasheet-for-dataset-template).
+
+## Another dataset datasheet
+
+In collaboration with the the [CheXpert team](https://stanfordmlgroup.github.io/competitions/chexpert/), we created a [datasheet for the CheXpert dataset](https://arxiv.org/abs/2105.03020).
+
+Accuracy is essential when documenting the details of a dataset. [Here is an example of using code](https://github.com/fau-masters-collected-works-cgarbin/chexpert_explorer) to create the tables in a datasheet to make the process reproducible, transparent, and auditable.
+
+## Model cards
+
+If you are interested in datasheets for datasets, you may also want to review [model cards](https://github.com/fau-masters-collected-works-cgarbin/model-card-template).
