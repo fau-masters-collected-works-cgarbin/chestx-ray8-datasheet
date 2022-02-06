@@ -16,9 +16,9 @@ An item of the "Uses" section, describing the image format and label details.
 
 ![A section of the dataset datasheet](./pics/chestx-ray8-datasheet-detail.png)
 
-Based on the [datasheet for dataset template in Overleaf](https://www.overleaf.com/latex/templates/datasheet-for-dataset-template/jgqyyzyprxth).
+## Templates
 
-A text version of the datasheet for dataset template is available [here](https://github.com/fau-masters-collected-works-cgarbin/datasheet-for-dataset-template).
+This datasheet was created with the [Overleaf template](https://www.overleaf.com/latex/templates/datasheet-for-dataset-template/jgqyyzyprxth). There is also a [Markdown template for datasheet for dataset](https://github.com/fau-masters-collected-works-cgarbin/datasheet-for-dataset-template).
 
 ## Another dataset datasheet
 
